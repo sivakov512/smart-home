@@ -1,0 +1,3 @@
+[submodule "broadlink-mqtt"]
+	path = broadlink-mqtt
+	url = git@github.com:eschava/broadlink-mqtt.git

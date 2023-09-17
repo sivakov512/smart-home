@@ -1,0 +1,53 @@
+name: broadlink-mqtt
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'broadlink-mqtt/**'
+      - .gitmodules
+  pull_request:
+    branches: [master]
+    paths:
+      - 'broadlink-mqtt/**'
+      - .gitmodules
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: sivakov512/broadlink-mqtt
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare
+        id: prep
+        run: |
+          SHORT_SHA=`git rev-parse --short HEAD`
+          IMAGE=$REGISTRY/$IMAGE_NAME
+          echo ::set-output name=latest::${IMAGE}:latest
+          echo ::set-output name=current::${IMAGE}:${SHORT_SHA}
+
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./broadlink-mqtt/
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ${{ steps.prep.outputs.latest }}
+            ${{ steps.prep.outputs.current }}
