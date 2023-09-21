@@ -1,0 +1,89 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/sivakov512/broadlink-mqtt
+  pullPolicy: IfNotPresent
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+service:
+  type: ClusterIP
+
+persistence:
+  enabled: true
+  accessMode: ReadWriteOnce
+  existingClaim: ""
+  mountPath: /opt/broadlink-mqtt/commands/
+  subPath: ""
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.
+  ##
+  storageClass: "local-path"
+  size: 1Gi
+
+existingConfigMap: ""
+config: |
+  # Type of device. Valid options are 'lookup', 'multiple_lookup', 'rm', 'rm4', 'sp1', 'sp2', 'a1', 'mp1', 'dooya', 'bg1'
+  device_type = 'rm4' # use lookup
+
+  ## lookup parameters
+  lookup_timeout = 20
+  #local_address = '127.0.0.1'
+
+  ## parameters for direct connection
+  device_host = '192.168.1.42'
+  device_mac  = 'ec:0b:ae:0c:ab:f9'
+
+  ## MQTT connection parameters
+  mqtt_broker = 'mosquitto'       # default: 'localhost'
+  mqtt_port = 1883                # default: 1883
+  mqtt_clientid = 'broadlink'
+  mqtt_username = ''
+  mqtt_password = ''
+  mqtt_topic_prefix = 'broadlink/'
+  mqtt_multiple_subprefix_format = '{type}_{mac_nic}/' # use only with 'multiple_lookup' device type (allowed parameters are {type}, {host}, {mac}, {mac_nic})
+  #mqtt_birth_topic = 'clients/broadlink'
+  #mqtt_birth_payload = 'Hello!'
+  mqtt_will_topic = 'clients/broadlink'
+  mqtt_will_payload = 'Adios!'
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+ 
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
