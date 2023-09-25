@@ -1,4 +1,4 @@
-use tokio;
+mod characteristics;
 
 use hap::{
     accessory::{heater_cooler::HeaterCoolerAccessory, AccessoryCategory, AccessoryInformation},
@@ -82,7 +82,7 @@ async fn main() -> Result<()> {
     if let Some(cooling_threshold_temperature) = service.cooling_threshold_temperature.as_mut() {
         cooling_threshold_temperature.on_read(Some(|| {
             println!("Reading: cooling_threshold_temperature");
-            Ok(Some(15 as f32))
+            Ok(Some(15_f32))
         }));
         cooling_threshold_temperature.set_value(15.into()).await?;
         cooling_threshold_temperature.set_step_value(Some(1.into()))?;
@@ -93,7 +93,7 @@ async fn main() -> Result<()> {
     if let Some(heating_threshold_temperature) = service.heating_threshold_temperature.as_mut() {
         heating_threshold_temperature.on_read(Some(|| {
             println!("Reading: heating_threshold_temperature");
-            Ok(Some(15 as f32))
+            Ok(Some(15_f32))
         }));
         heating_threshold_temperature.set_value(15.into()).await?;
         heating_threshold_temperature.set_step_value(Some(1.into()))?;

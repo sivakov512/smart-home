@@ -13,3 +13,6 @@ hap = { git = "https://github.com/sivakov512/hap-rs", version = "0.1.0-pre.15", 
 serde = "1.0"
 tokio = { version = "1.32", features = ["full"] }
 toml = "0.8"
+
+[dev-dependencies]
+rstest = "0.18"
