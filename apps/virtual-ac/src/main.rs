@@ -1,4 +1,5 @@
 mod characteristics;
+mod ac;
 
 use hap::{
     accessory::{heater_cooler::HeaterCoolerAccessory, AccessoryCategory, AccessoryInformation},

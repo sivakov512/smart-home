@@ -2,7 +2,7 @@
 use serde::Deserialize;
 use std::str::FromStr;
 
-#[derive(Deserialize, PartialEq, Debug)]
+#[derive(Deserialize, PartialEq, Debug, Clone)]
 pub struct Characteristics {
     pub manufacturer: String,
     pub model: String,
@@ -26,7 +26,7 @@ impl FromStr for Characteristics {
     }
 }
 
-#[derive(Deserialize, PartialEq, Debug)]
+#[derive(Deserialize, PartialEq, Debug, Clone)]
 pub struct TemperatureCharacteristics {
     pub min: f32,
     pub max: f32,
