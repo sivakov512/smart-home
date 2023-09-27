@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use serde::Deserialize;
 use std::str::FromStr;
 
@@ -7,8 +6,7 @@ pub struct Characteristics {
     pub manufacturer: String,
     pub model: String,
     pub name: String,
-    pub cooling: TemperatureCharacteristics,
-    pub heating: TemperatureCharacteristics,
+    pub temperature: TemperatureCharacteristics,
 }
 
 impl Characteristics {
@@ -45,12 +43,7 @@ manufacturer = 'Pretty vendor'
 model = 'Pretty model'
 name = "Pretty name"
 
-[cooling]
-min = 10
-max = 20
-step = 1
-
-[heating]
+[temperature]
 min = 21.5
 max = 28.5
 step = 0.5
@@ -64,12 +57,7 @@ step = 0.5
                 manufacturer: "Pretty vendor".into(),
                 model: "Pretty model".into(),
                 name: "Pretty name".into(),
-                cooling: TemperatureCharacteristics {
-                    min: 10.0,
-                    max: 20.0,
-                    step: 1.0
-                },
-                heating: TemperatureCharacteristics {
+                temperature: TemperatureCharacteristics {
                     min: 21.5,
                     max: 28.5,
                     step: 0.5
@@ -86,29 +74,19 @@ manufacturer = 100
 model = 'Pretty model'
 name = "Pretty name"
 
-[cooling]
-min = 10
+[temperature]
+min = 10.5
 max = 20
-step = 1
-
-[heating]
-min = 21.5
-max = 28.5
-step = 0.5
+step = 1.1
 "#,
             r#"
 model = 'Pretty model'
 name = "Pretty name"
 
-[cooling]
+[temperature]
 min = 10
 max = 20
 step = 1
-
-[heating]
-min = 21.5
-max = 28.5
-step = 0.5
 "#,
             r#"
 manufacturer = 'Pretty vendor'
@@ -118,26 +96,16 @@ name = "Pretty name"
 min = 10
 max = 20
 step = 1
-
-[heating]
-min = 21.5
-max = 28.5
-step = 0.5
 "#,
             r#"
 manufacturer = 'Pretty vendor'
 model = 'Pretty model'
 name = "Pretty name"
 
-[cooling]
+[temperature]
 min = hundred
 max = 20
 step = 1
-
-[heating]
-min = 21.5
-max = 28.5
-step = 0.5
 "#
         )]
         input: &str,

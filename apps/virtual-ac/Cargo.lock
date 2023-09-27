@@ -1648,6 +1648,7 @@ dependencies = [
  "hap",
  "rstest",
  "serde",
+ "serde_json",
  "tokio",
  "toml",
 ]

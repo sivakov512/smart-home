@@ -1,44 +1,62 @@
-#![allow(dead_code)]
 use crate::characteristics::Characteristics;
+use std::sync::{Arc, Mutex};
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Default)]
 pub enum Mode {
-    Heating(f32),
-    Cooling(f32),
+    #[default]
+    Off,
+    Heat,
+    Cool,
+    Auto,
 }
 
 #[derive(Default, Debug, PartialEq)]
-pub struct State {
-    mode: Option<Mode>,
+struct State {
+    mode: Mode,
+    target_temperature: f32,
     current_temperature: f32,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct AC {
-    characteristics: Characteristics,
-    state: State,
+    pub characteristics: Characteristics,
+    state: Arc<Mutex<State>>,
 }
 
 impl From<Characteristics> for AC {
     fn from(characteristics: Characteristics) -> Self {
         Self {
             characteristics,
-            state: State::default(),
+            state: Arc::new(Mutex::new(State::default())),
         }
     }
 }
 
 impl AC {
-    pub fn set_mode(&mut self, mode: Option<Mode>) {
-        self.state.mode = mode;
+    fn lock_state(&self) -> std::sync::MutexGuard<State> {
+        self.state.lock().unwrap()
     }
 
-    pub fn mode(&self) -> &Option<Mode> {
-        &self.state.mode
+    pub fn set_mode(&self, mode: Mode) {
+        self.lock_state().mode = mode;
+        dbg!(self.lock_state());
     }
 
-    pub fn current_temperature(&self) -> f32 {
-        self.state.current_temperature
+    pub fn get_mode(&self) -> Mode {
+        self.lock_state().mode.clone()
+    }
+
+    pub fn get_current_temperature(&self) -> f32 {
+        self.lock_state().current_temperature
+    }
+
+    pub fn get_target_temperature(&self) -> f32 {
+        self.lock_state().target_temperature
+    }
+
+    pub fn set_target_temperature(&self, target_temperature: f32) {
+        self.lock_state().target_temperature = target_temperature;
+        dbg!(self.lock_state());
     }
 }
 
@@ -54,15 +72,10 @@ mod tests {
             manufacturer: "Pretty vendor".into(),
             model: "Pretty model".into(),
             name: "Pretty name".into(),
-            cooling: TemperatureCharacteristics {
+            temperature: TemperatureCharacteristics {
                 min: 10.0,
                 max: 20.0,
                 step: 1.0,
-            },
-            heating: TemperatureCharacteristics {
-                min: 21.5,
-                max: 28.5,
-                step: 0.5,
             },
         }
     }
@@ -71,10 +84,11 @@ mod tests {
     fn ac(characteristics: Characteristics) -> AC {
         AC {
             characteristics,
-            state: State {
-                mode: None,
+            state: Arc::new(Mutex::new(State {
+                mode: Mode::Off,
+                target_temperature: 0.0,
                 current_temperature: 0.0,
-            },
+            })),
         }
     }
 
@@ -82,37 +96,50 @@ mod tests {
     fn ac_created_from_characteristics_correctly(characteristics: Characteristics, ac: AC) {
         let got = AC::from(characteristics);
 
-        assert_eq!(got, ac)
+        assert_eq!(got.characteristics, ac.characteristics);
+        let lhs_state = got.state.lock().unwrap();
+        assert_eq!(*lhs_state, *ac.state.lock().unwrap())
     }
 
     #[rstest]
-    fn sets_mode_correctly(
-        mut ac: AC,
-        #[values(None, Some(Mode::Heating(26.5)), Some(Mode::Cooling(17.5)))] mode: Option<Mode>,
-    ) {
+    fn sets_mode_correctly(ac: AC, #[values(Mode::Off, Mode::Heat, Mode::Cool)] mode: Mode) {
         ac.set_mode(mode.clone());
 
-        assert_eq!(ac.state.mode, mode)
+        assert!(ac.state.lock().is_ok());
+        assert_eq!(ac.state.lock().unwrap().mode, mode)
     }
 
     #[rstest]
-    fn returns_mode_from_state(
-        mut ac: AC,
-        #[values(None, Some(Mode::Heating(26.5)), Some(Mode::Cooling(17.5)))] mode: Option<Mode>,
-    ) {
-        ac.state.mode = mode.clone();
+    fn returns_mode_from_state(ac: AC, #[values(Mode::Off, Mode::Heat, Mode::Cool)] mode: Mode) {
+        ac.state.lock().unwrap().mode = mode.clone();
 
-        let got = ac.mode();
+        let got = ac.get_mode();
 
-        assert_eq!(got, &mode)
+        assert_eq!(got, mode)
     }
 
     #[rstest]
-    fn returns_current_temperature_from_state(mut ac: AC) {
-        ac.state.current_temperature = 13.2;
+    fn returns_current_temperature_from_state(ac: AC) {
+        ac.state.lock().unwrap().current_temperature = 13.2;
 
-        let got = ac.current_temperature();
+        let got = ac.get_current_temperature();
 
         assert_eq!(got, 13.2);
+    }
+
+    #[rstest]
+    fn returns_target_temperature_from_state(ac: AC) {
+        ac.state.lock().unwrap().target_temperature = 13.2;
+
+        let got = ac.get_target_temperature();
+
+        assert_eq!(got, 13.2);
+    }
+
+    #[rstest]
+    fn sets_target_temperature_correctly(ac: AC) {
+        ac.set_target_temperature(25.5);
+
+        assert_eq!(ac.state.lock().unwrap().target_temperature, 25.5);
     }
 }
