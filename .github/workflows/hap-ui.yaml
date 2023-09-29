@@ -1,0 +1,42 @@
+name: hap-ui
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'apps/hap-ui/**'
+      - .gitmodules
+      - .github/workflows/hap-ui.yaml
+  pull_request:
+    branches: [master]
+    paths:
+      - 'apps/hap-ui/**'
+      - .gitmodules
+      - .github/workflows/hap-ui.yaml
+
+
+defaults:
+  run:
+    working-directory: ./apps/hap-ui/
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: sivakov512/hap-ui
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.21.x'
+
+      - run: go get .
+
+      - run: go build -v ./...
+
+      - run: go test
+
