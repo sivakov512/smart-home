@@ -11,8 +11,18 @@ import (
 	"syscall"
 )
 
+const (
+    HAPUICONFIG_ENV_KEY = "HAPUICONFIG"
+    HAPUICONFIG_DEFAULT_FPATH = "./config.toml"
+)
+
 func main() {
-	config, err := airconditioner.LoadConfig("./config.toml")
+    fpath, exist := os.LookupEnv(HAPUICONFIG_ENV_KEY)
+    if !exist {
+        fpath = HAPUICONFIG_DEFAULT_FPATH
+    }
+
+	config, err := airconditioner.LoadConfig(fpath)
 	if err != nil {
 		panic(err)
 	}
