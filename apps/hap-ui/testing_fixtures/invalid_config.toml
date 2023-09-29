@@ -6,3 +6,8 @@ pin = "11122333"
 min = 9.5
 max = 31.5
 step = 0.8
+
+[qtt]
+broker = "tcp://iot.eclipse.org:1883"
+update_topic = "ac/update/LivingRoom"
+status_topic = "ac/status/LivingRoom"
