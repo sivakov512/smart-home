@@ -14,8 +14,13 @@ func TestLoadsConfigCorrectly(t *testing.T) {
 		Manufacturer: "Midea",
 		Name:         "AC",
 		PIN:          "11122333",
-		Temperature: airconditioner.Temperature{
+		Cooling: airconditioner.Temperature{
 			Min:  9.5,
+			Max:  31.5,
+			Step: 0.8,
+		},
+		Heating: airconditioner.Temperature{
+			Min:  0.5,
 			Max:  31.5,
 			Step: 0.8,
 		},
