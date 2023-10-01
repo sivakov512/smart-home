@@ -22,4 +22,4 @@ ENV HAPUICONFIG="/opt/hap-ui/conf/config.toml"
 
 COPY --from=builder /opt/hap-ui/hap-ui /opt/hap-ui/hap-ui
 
-CMD hap-ui
+CMD ./hap-ui
