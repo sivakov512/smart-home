@@ -38,7 +38,7 @@ jobs:
 
       - run: go build -v ./...
 
-      - run: go test
+      - run: go test -v */**.go
 
   publish:
     runs-on: ubuntu-latest
