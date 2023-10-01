@@ -33,7 +33,9 @@ func NewHandler(config *Config) *Handler {
 	handler.setupCurrentTemperature(config)
 	handler.setupThresholds(config)
 
-    handler.setupMQTTSubsriber(config)
+    handler.setInitialValues(config)
+
+	handler.setupMQTTSubsriber(config)
 
 	return &handler
 }
@@ -111,18 +113,25 @@ func (h *Handler) setupThresholds(config *Config) {
 
 	CoolingThreshold := h.HAPAccessory.HAPService.CoolingThresholdTemperature
 
-	CoolingThreshold.SetMinValue(config.Temperature.Min)
-	CoolingThreshold.SetMaxValue(config.Temperature.Max)
-	CoolingThreshold.SetStepValue(config.Temperature.Step)
+	CoolingThreshold.SetMinValue(config.Cooling.Min)
+	CoolingThreshold.SetMaxValue(config.Cooling.Max)
+	CoolingThreshold.SetStepValue(config.Cooling.Step)
 	CoolingThreshold.OnValueRemoteUpdate(OnValueRemoteUpdate)
 	CoolingThreshold.ValueRequestFunc = ValueRequestFunc
 
 	HeatingThreshold := h.HAPAccessory.HAPService.HeatingThresholdTemperature
-	HeatingThreshold.SetMinValue(config.Temperature.Min)
-	HeatingThreshold.SetMaxValue(config.Temperature.Max)
-	HeatingThreshold.SetStepValue(config.Temperature.Step)
+	HeatingThreshold.SetMinValue(config.Heating.Min)
+	HeatingThreshold.SetMaxValue(config.Heating.Max)
+	HeatingThreshold.SetStepValue(config.Heating.Step)
 	HeatingThreshold.OnValueRemoteUpdate(OnValueRemoteUpdate)
 	HeatingThreshold.ValueRequestFunc = ValueRequestFunc
+}
+
+func (h *Handler) setInitialValues(config *Config) {
+    h.State.SetActive(false)
+    h.State.SetMode(Cool)
+    h.State.SetCurrentTemperature(config.Cooling.Min)
+    h.State.SetTargetTemperature(config.Cooling.Min)
 }
 
 func (h *Handler) setupMQTTSubsriber(config *Config) {
@@ -145,7 +154,7 @@ func (h *Handler) setupMQTTSubsriber(config *Config) {
 		service.CurrentHeaterCoolerState.SetValue(modeToCurrentState(mode))
 		service.TargetHeaterCoolerState.SetValue(modeToTargetState(mode))
 
-        service.CurrentTemperature.SetValue(h.State.GetCurrentTemperature())
+		service.CurrentTemperature.SetValue(h.State.GetCurrentTemperature())
 
 		targetTemperature := h.State.GetTargetTemperature()
 		service.CoolingThresholdTemperature.SetValue(targetTemperature)

@@ -9,7 +9,8 @@ type Config struct {
 	Manufacturer string
 	Name         string
 	PIN          string
-	Temperature  Temperature
+	Cooling      Temperature
+	Heating      Temperature
 	MQTT         MQTT
 }
 
@@ -21,8 +22,8 @@ type Temperature struct {
 
 type MQTT struct {
 	Broker      string
-    UpdateTopic string `toml:"update_topic"`
-    StatusTopic string `toml:"status_topic"`
+	UpdateTopic string `toml:"update_topic"`
+	StatusTopic string `toml:"status_topic"`
 }
 
 func LoadConfig(fpath string) (*Config, error) {

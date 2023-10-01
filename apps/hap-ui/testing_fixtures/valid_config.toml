@@ -2,8 +2,13 @@ manufacturer = "Midea"
 name = "AC"
 pin = "11122333"
 
-[temperature]
+[cooling]
 min = 9.5
+max = 31.5
+step = 0.8
+
+[heating]
+min = 0.5
 max = 31.5
 step = 0.8
 
