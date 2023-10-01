@@ -1,0 +1,52 @@
+name: virtual-ac
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'apps/virtual-ac/**'
+      - .github/workflows/virtual-ac.yaml
+  pull_request:
+    branches: [master]
+    paths:
+      - 'apps/virtual-ac/**'
+      - .github/workflows/virtual-ac.yaml
+
+defaults:
+  run:
+    working-directory: ./apps/virtual-ac/
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          components: rustfmt, clippy
+          override: true
+          profile: minimal
+          toolchain: stable
+
+      - id: prep
+        run: |
+          echo "base_key=${{ github.workflow }}-${{ github.job }}-${{ steps.toolchain.outputs.rustc_hash }}-${{ hashFiles('apps/virtual-ac/Cargo.lock') }}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            apps/virtual-ac/target
+          key: ${{ steps.prep.outputs.base_key }}-${{ github.ref }}
+          restore-keys: |
+            ${{ steps.prep.outputs.base_key }}-refs/heads/master
+            ${{ steps.prep.outputs.base_key }}-
+
+      - run: cargo test
+
+      - run: cargo fmt --all -- --check
+
+      - run: cargo clippy -- -D warnings
