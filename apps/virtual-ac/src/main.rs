@@ -1,5 +1,6 @@
 mod config;
 mod device;
+mod state;
 
 use config::Config;
 use device::Device;
