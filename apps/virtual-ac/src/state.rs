@@ -28,12 +28,15 @@ pub struct State {
 
 impl State {
     pub fn as_broadlink_command(&self, prefix: &str) -> String {
-        format!(
+        match self.is_active {
+            true => format!(
             "{prefix}/is_active/{is_active}/mode/{mode}/target_temperature/{target_temperature:.1}",
             is_active = self.is_active,
-            mode = self.mode.to_string(),
+            mode = self.mode,
             target_temperature = self.target_temperature,
-        )
+        ),
+            false => format!("{prefix}/is_active/{is_active}", is_active = self.is_active,),
+        }
     }
 }
 
@@ -77,7 +80,7 @@ mod tests {
             current_temperature: 0.0,
             target_temperature: 0.0,
         },
-        "broadlink/ac/LivingRoom/is_active/false/mode/cool/target_temperature/0.0"
+        "broadlink/ac/LivingRoom/is_active/false"
     )]
     #[case(
         State{
