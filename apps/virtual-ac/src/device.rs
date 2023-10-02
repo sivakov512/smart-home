@@ -1,3 +1,4 @@
+use crate::config::Config;
 use futures::stream::StreamExt;
 use paho_mqtt as mqtt;
 use serde::{Deserialize, Serialize};
@@ -35,13 +36,15 @@ impl From<&[u8]> for State {
 pub struct Device {
     state: Arc<Mutex<State>>,
     mqtt: mqtt::AsyncClient,
+    config: Config,
 }
 
 impl Device {
-    pub fn new(mqtt_broker: &str) -> Self {
+    pub fn new(config: Config) -> Self {
         Self {
             state: Arc::new(Mutex::new(State::default())),
-            mqtt: mqtt::AsyncClient::new(mqtt_broker).unwrap(),
+            mqtt: mqtt::AsyncClient::new(config.mqtt_broker.as_str()).unwrap(),
+            config,
         }
     }
 
@@ -51,7 +54,7 @@ impl Device {
 
         self.mqtt
             .publish(mqtt::Message::new_retained(
-                "ac/status/LivingRoom",
+                &self.config.status_topic,
                 Vec::from(&*state),
                 0,
             ))
@@ -64,7 +67,7 @@ impl Device {
         let mut stream = self.mqtt.get_stream(25);
 
         self.mqtt.connect(None).await?;
-        self.mqtt.subscribe("ac/update/LivingRoom", 0).await?;
+        self.mqtt.subscribe(&self.config.update_topic, 0).await?;
 
         while let Some(msg_opts) = stream.next().await {
             if let Some(msg) = msg_opts {
