@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "virtual-ac.fullname" . }}
+  labels:
+    {{- include "virtual-ac.labels" . | nindent 4 }}
+data:
+  config.toml: {{- toYaml .Values.config | nindent 2 }}

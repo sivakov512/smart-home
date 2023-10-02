@@ -27,6 +27,9 @@ FROM debian:bookworm-slim
 RUN mkdir -p /opt/virtual-ac
 WORKDIR /opt/virtual-ac
 
+RUN apt-get update && \
+    apt-get install -y openssl
+
 VOLUME ["/opt/virtual-ac/conf"]
 
 ENV VIRTUALACCONFIG="/opt/virtual-ac/conf/config.toml"

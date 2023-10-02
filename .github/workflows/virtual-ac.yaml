@@ -97,3 +97,5 @@ jobs:
           tags: |
             ${{ steps.prep.outputs.latest }}
             ${{ steps.prep.outputs.current }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
