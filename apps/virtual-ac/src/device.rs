@@ -24,6 +24,11 @@ impl Device {
         let mut state = self.state.lock().await;
         *state = msg.payload().into();
 
+        // Make broadlink command and send
+        let cmd = state.as_broadlink_command(&self.config.broadlink_topic_prefix);
+        self.mqtt.publish(mqtt::Message::new(cmd, "", 0)).await?;
+
+        // Notify about changed state
         self.mqtt
             .publish(mqtt::Message::new_retained(
                 &self.config.status_topic,
