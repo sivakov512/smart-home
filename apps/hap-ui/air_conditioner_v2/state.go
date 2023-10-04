@@ -2,7 +2,6 @@ package airconditionerv2
 
 import (
 	"encoding/json"
-	"sync"
 )
 
 type Mode string
@@ -13,11 +12,10 @@ const (
 )
 
 type State struct {
-	Mutex              sync.Mutex `json:"-"`
-	IsActive           bool       `json:"is_active"`
-	Mode               Mode       `json:"mode"`
-	TargetTemperature  float64    `json:"target_temperature"`
-	CurrentTemperature float64    `json:"current_temperature"`
+	IsActive           bool    `json:"is_active"`
+	Mode               Mode    `json:"mode"`
+	TargetTemperature  float64 `json:"target_temperature"`
+	CurrentTemperature float64 `json:"current_temperature"`
 }
 
 func NewState() *State {
@@ -33,4 +31,8 @@ func (s *State) Serialize() []byte {
 	}
 
 	return c
+}
+
+func DeserializeState(i []byte, s *State) {
+	json.Unmarshal(i, &s)
 }
