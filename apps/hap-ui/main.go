@@ -4,7 +4,7 @@ import (
 	"github.com/brutella/hap"
 
 	"context"
-	"hap-ui/air_conditioner"
+	"hap-ui/air_conditioner_v2"
 	"log"
 	"os"
 	"os/signal"
@@ -12,22 +12,22 @@ import (
 )
 
 const (
-    HAPUICONFIG_ENV_KEY = "HAPUICONFIG"
-    HAPUICONFIG_DEFAULT_FPATH = "./config.toml"
+	HAPUICONFIG_ENV_KEY       = "HAPUICONFIG"
+	HAPUICONFIG_DEFAULT_FPATH = "./config.toml"
 )
 
 func main() {
-    fpath, exist := os.LookupEnv(HAPUICONFIG_ENV_KEY)
-    if !exist {
-        fpath = HAPUICONFIG_DEFAULT_FPATH
-    }
+	fpath, exist := os.LookupEnv(HAPUICONFIG_ENV_KEY)
+	if !exist {
+		fpath = HAPUICONFIG_DEFAULT_FPATH
+	}
 
-	config, err := airconditioner.LoadConfig(fpath)
+	config, err := airconditionerv2.LoadConfig(fpath)
 	if err != nil {
 		panic(err)
 	}
 
-	handler := airconditioner.NewHandler(config)
+	handler := airconditionerv2.NewHandler(config)
 
 	fs := hap.NewFsStore("./db")
 
