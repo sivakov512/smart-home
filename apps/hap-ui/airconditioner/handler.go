@@ -1,4 +1,4 @@
-package airconditionerv2
+package airconditioner
 
 import (
 	"github.com/brutella/hap/accessory"

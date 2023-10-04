@@ -1,4 +1,4 @@
-package airconditionerv2
+package airconditioner
 
 import (
 	"github.com/pelletier/go-toml/v2"

@@ -4,7 +4,7 @@ import (
 	"github.com/brutella/hap"
 
 	"context"
-	"hap-ui/air_conditioner_v2"
+	"hap-ui/airconditioner"
 	"log"
 	"os"
 	"os/signal"
@@ -22,12 +22,12 @@ func main() {
 		fpath = HAPUICONFIG_DEFAULT_FPATH
 	}
 
-	config, err := airconditionerv2.LoadConfig(fpath)
+	config, err := airconditioner.LoadConfig(fpath)
 	if err != nil {
 		panic(err)
 	}
 
-	handler := airconditionerv2.NewHandler(config)
+	handler := airconditioner.NewHandler(config)
 
 	fs := hap.NewFsStore("./db")
 
