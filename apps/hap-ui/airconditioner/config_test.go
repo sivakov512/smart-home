@@ -1,8 +1,8 @@
-package airconditionerv2_test
+package airconditioner_test
 
 import (
 	"github.com/stretchr/testify/assert"
-	"hap-ui/air_conditioner"
+	"hap-ui/airconditioner"
 	"testing"
 )
 

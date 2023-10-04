@@ -1,29 +1,29 @@
-package airconditionerv2_test
+package airconditioner_test
 
 import (
 	"github.com/stretchr/testify/assert"
-	"hap-ui/air_conditioner_v2"
+	"hap-ui/airconditioner"
 	"testing"
 )
 
 var (
 	serializationCases = []struct {
-		de *airconditionerv2.State
+		de *airconditioner.State
 		se string
 	}{
 		{
-			de: &airconditionerv2.State{
+			de: &airconditioner.State{
 				IsActive:           true,
-				Mode:               airconditionerv2.Cool,
+				Mode:               airconditioner.Cool,
 				TargetTemperature:  23.0,
 				CurrentTemperature: 25.5,
 			},
 			se: "{\"is_active\":true,\"mode\":\"cool\",\"target_temperature\":23,\"current_temperature\":25.5}",
 		},
 		{
-			de: &airconditionerv2.State{
+			de: &airconditioner.State{
 				IsActive:           false,
-				Mode:               airconditionerv2.Heat,
+				Mode:               airconditioner.Heat,
 				TargetTemperature:  28.2,
 				CurrentTemperature: 14.0,
 			},
@@ -33,11 +33,11 @@ var (
 )
 
 func TestNewStateReturnsExpected(t *testing.T) {
-	got := airconditionerv2.NewState()
+	got := airconditioner.NewState()
 
-	assert.Equal(t, &airconditionerv2.State{
+	assert.Equal(t, &airconditioner.State{
 		IsActive:           false,
-		Mode:               airconditionerv2.Cool,
+		Mode:               airconditioner.Cool,
 		TargetTemperature:  0.0,
 		CurrentTemperature: 0.0,
 	}, got)
@@ -57,9 +57,9 @@ func TestStateDeserializesCorrectly(t *testing.T) {
 	for _, tCase := range serializationCases {
 		t.Run(tCase.se, func(t *testing.T) {
 			input := []byte(tCase.se)
-			var got airconditionerv2.State
+			var got airconditioner.State
 
-			airconditionerv2.DeserializeState(input, &got)
+			airconditioner.DeserializeState(input, &got)
 
 			assert.Equal(t, tCase.de, &got)
 		})
