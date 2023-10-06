@@ -1,0 +1,80 @@
+replicaCount: 1
+
+image:
+  repository: koenkk/zigbee2mqtt
+  pullPolicy: IfNotPresent
+  tag: "1.33.1"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+service:
+  type: ClusterIP
+  port: 8080
+
+persistence:
+  accessMode: ReadWriteOnce
+  existingClaim: ""
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.
+  ##
+  storageClass: "local-path"
+  size: 1Gi
+
+existingConfigMap: ""
+config: |
+  # Let new devices join our zigbee network
+  permit_join: true
+  # Docker Compose makes the MQTT-Server available using "mqtt" hostname
+  mqtt:
+    base_topic: zigbee
+    server: mqtt://mosquitto:1883
+  # Zigbee Adapter path
+  serial:
+    port: /dev/ttyACM0
+  # Enable the Zigbee2MQTT frontend
+  frontend:
+    port: 8080
+  # Let Zigbee2MQTT generate a new network key on first start
+  advanced:
+    network_key: GENERATE
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext:
+  privileged: true
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
