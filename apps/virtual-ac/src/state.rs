@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Default, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
-enum Mode {
+pub enum Mode {
     #[default]
     Cool,
     Heat,
@@ -20,10 +20,10 @@ impl std::fmt::Display for Mode {
 
 #[derive(Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct State {
-    is_active: bool,
-    mode: Mode,
-    current_temperature: f32,
-    target_temperature: f32,
+    pub is_active: bool,
+    pub mode: Mode,
+    pub current_temperature: f32,
+    pub target_temperature: f32,
 }
 
 impl State {

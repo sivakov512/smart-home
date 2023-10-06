@@ -1,5 +1,6 @@
 use crate::config::Config;
 use crate::state::State;
+use crate::thermal_sensor;
 use futures::stream::StreamExt;
 use paho_mqtt as mqtt;
 use std::sync::Arc;
@@ -21,21 +22,45 @@ impl Device {
     }
 
     async fn handle_message(&self, msg: mqtt::Message) -> anyhow::Result<()> {
-        let mut state = self.state.lock().await;
-        *state = msg.payload().into();
+        match msg.topic() {
+            t if t == self.config.update_topic => {
+                let mut state = self.state.lock().await;
 
-        // Make broadlink command and send
-        let cmd = state.as_broadlink_command(&self.config.broadlink_topic_prefix);
-        self.mqtt.publish(mqtt::Message::new(cmd, "", 0)).await?;
+                *state = msg.payload().into();
 
-        // Notify about changed state
-        self.mqtt
-            .publish(mqtt::Message::new_retained(
-                &self.config.status_topic,
-                Vec::from(&*state),
-                0,
-            ))
-            .await?;
+                // Make broadlink command and send
+                let cmd = state.as_broadlink_command(&self.config.broadlink_topic_prefix);
+                self.mqtt.publish(mqtt::Message::new(cmd, "", 0)).await?;
+
+                // Notify about changed state
+                self.mqtt
+                    .publish(mqtt::Message::new_retained(
+                        &self.config.status_topic,
+                        Vec::from(&*state),
+                        0,
+                    ))
+                    .await?;
+            }
+            t if t == self.config.thermal_sensor_topic => {
+                let thermal_state = thermal_sensor::State::from(msg.payload());
+
+                if let Some(temperature) = thermal_state.temperature {
+                    let mut state = self.state.lock().await;
+
+                    state.current_temperature = temperature;
+
+                    // Notify about changed state
+                    self.mqtt
+                        .publish(mqtt::Message::new_retained(
+                            &self.config.status_topic,
+                            Vec::from(&*state),
+                            0,
+                        ))
+                        .await?;
+                }
+            }
+            _ => (),
+        }
 
         Ok(())
     }
@@ -45,6 +70,9 @@ impl Device {
 
         self.mqtt.connect(None).await?;
         self.mqtt.subscribe(&self.config.update_topic, 0).await?;
+        self.mqtt
+            .subscribe(&self.config.thermal_sensor_topic, 0)
+            .await?;
 
         while let Some(msg_opts) = stream.next().await {
             if let Some(msg) = msg_opts {
