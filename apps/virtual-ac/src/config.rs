@@ -7,6 +7,7 @@ pub struct Config {
     pub status_topic: String,
     pub update_topic: String,
     pub broadlink_topic_prefix: String,
+    pub thermal_sensor_topic: String,
 }
 
 impl Config {
@@ -36,6 +37,7 @@ mqtt_broker = 'tcp://localhost:1883'
 status_topic = 'ac/status/LivingRoom'
 update_topic = 'ac/update/LivingRoom'
 broadlink_topic_prefix = 'broadlink/ac/LivingRoom'
+thermal_sensor_topic = 'zigbee/status/ThermalSensor/LivingRoom'
 "#;
 
         let got = input.parse::<Config>();
@@ -48,6 +50,7 @@ broadlink_topic_prefix = 'broadlink/ac/LivingRoom'
                 status_topic: "ac/status/LivingRoom".into(),
                 update_topic: "ac/update/LivingRoom".into(),
                 broadlink_topic_prefix: "broadlink/ac/LivingRoom".into(),
+                thermal_sensor_topic: "zigbee/status/ThermalSensor/LivingRoom".into(),
             }
         )
     }
@@ -60,17 +63,20 @@ qtt_broker = 'tcp://localhost:1883
 status_topic = 'ac/status/LivingRoom'
 update_topic = 'ac/update/LivingRoom'
 broadlink_topic_prefix = 'broadlink/ac/LivingRoom'
+thermal_sensor_topic = 'zigbee/status/ThermalSensor/LivingRoom'
 "#,
             r#"
 mqtt_broker = 100
 status_topic = 'ac/status/LivingRoom'
 update_topic = 'ac/update/LivingRoom'
 broadlink_topic_prefix = 'broadlink/ac/LivingRoom'
+thermal_sensor_topic = 'zigbee/status/ThermalSensor/LivingRoom'
 "#,
             r#"
 status_topic = 'ac/status/LivingRoom'
 update_topic = 'ac/update/LivingRoom'
 broadlink_topic_prefix = 'broadlink/ac/LivingRoom'
+thermal_sensor_topic = 'zigbee/status/ThermalSensor/LivingRoom'
 "#
         )]
         input: &str,
@@ -92,6 +98,7 @@ broadlink_topic_prefix = 'broadlink/ac/LivingRoom'
                 status_topic: "ac/status/LivingRoom".into(),
                 update_topic: "ac/update/LivingRoom".into(),
                 broadlink_topic_prefix: "broadlink/ac/LivingRoom".into(),
+                thermal_sensor_topic: "zigbee/status/ThermalSensor/LivingRoom".into(),
             }
         )
     }

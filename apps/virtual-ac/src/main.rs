@@ -1,6 +1,7 @@
 mod config;
 mod device;
 mod state;
+mod thermal_sensor;
 
 use config::Config;
 use device::Device;
