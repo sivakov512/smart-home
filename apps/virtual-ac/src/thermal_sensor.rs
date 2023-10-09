@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 #[derive(Debug, PartialEq, Default, Deserialize)]
 pub struct State {
-    pub battery: Option<u32>,
+    pub battery: Option<f32>,
     pub humidity: Option<f32>,
     #[serde(rename(deserialize = "linkquality"))]
     pub link_quality: Option<u32>,
@@ -23,9 +23,9 @@ mod tests {
 
     #[rstest]
     #[case(
-        "{\"battery\":100,\"humidity\":53.66,\"linkquality\":188,\"temperature\":24.04,\"voltage\":3200}",
+        "{\"battery\":98.5,\"humidity\":53.66,\"linkquality\":188,\"temperature\":24.04,\"voltage\":3200}",
         State{
-            battery: Some(100),
+            battery: Some(98.5),
             humidity: Some(53.66),
             link_quality: Some(188),
             temperature: Some(24.04),
