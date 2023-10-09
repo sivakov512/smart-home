@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: ghcr.io/sivakov512/virtual-ac
   pullPolicy: IfNotPresent
-  tag: ""
+  tag: "latest"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -25,6 +25,7 @@ config: |
   status_topic = 'ac/status/LivingRoom'
   update_topic = 'ac/update/LivingRoom'
   broadlink_topic_prefix = 'broadlink/ac/LivingRoom'
+  thermal_sensor_topic = 'zigbee/status/LivingRoom/ThermalSensor'
 
 podSecurityContext: {}
   # fsGroup: 2000
