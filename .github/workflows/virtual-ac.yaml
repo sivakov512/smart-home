@@ -62,12 +62,6 @@ jobs:
       contents: read
       packages: write
 
-    strategy:
-      matrix:
-        platform:
-          # - linux/amd64
-          - linux/arm64
-
     steps:
       - uses: actions/checkout@v4
 
@@ -92,7 +86,7 @@ jobs:
       - uses: docker/build-push-action@v5
         with:
           context: ./apps/virtual-ac/
-          platforms: ${{ matrix.platform }}
+          platforms: linux/amd64, linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ steps.prep.outputs.latest }}
