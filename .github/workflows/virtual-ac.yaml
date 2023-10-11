@@ -38,7 +38,7 @@ jobs:
         run: |
           echo "base_key=${{ github.workflow }}-${{ github.job }}-${{ steps.toolchain.outputs.rustc_hash }}-${{ hashFiles('apps/virtual-ac/Cargo.lock') }}" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.cargo/registry
