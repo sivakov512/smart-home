@@ -7,12 +7,17 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0"
+async-trait = "0.1"
+env_logger = "0.10"
 futures = "0.3"
 paho-mqtt = "0.12"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+sonoff-minir3 = "0.1"
 tokio = { version = "1.33", features = ["full"] }
 toml = "0.8"
 
 [dev-dependencies]
-rstest = "0.18.2"
+async-std = { version = "1.12", features = ["attributes"] }
+mockall = "0.11"
+rstest = "0.18"
