@@ -1,0 +1,4 @@
+qtt_broker = 'tcp://localhost:1883
+status_topic = 'heater/status/Kitchen'
+update_topic = 'heater/update/Kitchen'
+hermal_sensor_topic = 'zigbee/status/ThermalSensor/Kitchen'

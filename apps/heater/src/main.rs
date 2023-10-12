@@ -1,3 +1,4 @@
+mod config;
 mod state;
 mod thermal_sensor;
 
