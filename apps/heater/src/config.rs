@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use serde::Deserialize;
 use std::str::FromStr;
 
@@ -8,6 +7,7 @@ pub struct Config {
     pub status_topic: String,
     pub update_topic: String,
     pub thermal_sensor_topic: String,
+    pub sonoff_relay_ip: String,
 }
 
 impl Config {
@@ -37,6 +37,7 @@ mqtt_broker = 'tcp://localhost:1883'
 status_topic = 'heater/status/Kitchen'
 update_topic = 'heater/update/Kitchen'
 thermal_sensor_topic = 'zigbee/status/ThermalSensor/Kitchen'
+sonoff_relay_ip = '192.168.1.50'
 "#;
 
         let got = input.parse::<Config>();
@@ -49,6 +50,7 @@ thermal_sensor_topic = 'zigbee/status/ThermalSensor/Kitchen'
                 status_topic: "heater/status/Kitchen".into(),
                 update_topic: "heater/update/Kitchen".into(),
                 thermal_sensor_topic: "zigbee/status/ThermalSensor/Kitchen".into(),
+                sonoff_relay_ip: "192.168.1.50".into()
             }
         )
     }
@@ -61,17 +63,20 @@ qtt_broker = 'tcp://localhost:1883
 status_topic = 'heater/status/Kitchen'
 update_topic = 'heater/update/Kitchen'
 thermal_sensor_topic = 'zigbee/status/ThermalSensor/Kitchen'
+sonoff_relay_ip = '192.168.1.50'
 "#,
             r#"
 mqtt_broker = 100
 status_topic = 'heater/status/Kitchen'
 update_topic = 'heater/update/Kitchen'
 thermal_sensor_topic = 'zigbee/status/ThermalSensor/Kitchen'
+sonoff_relay_ip = '192.168.1.50'
 "#,
             r#"
 status_topic = 'heater/status/Kitchen'
 update_topic = 'heater/update/Kitchen'
 thermal_sensor_topic = 'zigbee/status/ThermalSensor/Kitchen'
+onoff_relay_ip = '192.168.1.50'
 "#
         )]
         input: &str,
@@ -93,6 +98,7 @@ thermal_sensor_topic = 'zigbee/status/ThermalSensor/Kitchen'
                 status_topic: "heater/status/Kitchen".into(),
                 update_topic: "heater/update/Kitchen".into(),
                 thermal_sensor_topic: "zigbee/status/ThermalSensor/Kitchen".into(),
+                sonoff_relay_ip: "192.168.1.50".into()
             }
         )
     }
