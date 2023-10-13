@@ -32,7 +32,7 @@ RUN apt-get update && \
 
 VOLUME ["/opt/heater/conf"]
 
-ENV VIRTUALACCONFIG="/opt/heater/conf/config.toml"
+ENV HEATERCONFIG="/opt/heater/conf/config.toml"
 
 COPY --from=builder /opt/heater/target/release/heater /opt/heater/heater
 

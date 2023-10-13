@@ -28,7 +28,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: VIRTUALACCONFIG
+            - name: HEATERCONFIG
               value: /opt/heater/conf/config.toml
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
