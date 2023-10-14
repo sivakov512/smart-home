@@ -1,18 +1,20 @@
-manufacturer = "Midea"
-name = "AC"
+roker = "tcp://iot.eclipse.org:1883"
 pin = "11122333"
 
-[ooling]
+[aac]
+manufacturer = "Midea"
+name = "AC"
+
+[c.cooling]
 min = 9.5
 max = 31.5
 step = 0.8
 
-[heatin]
-min = 9.5
+[ac.heating]
+min = 0.5
 max = 31.5
 step = 0.8
 
-[qtt]
-broker = "tcp://iot.eclipse.org:1883"
+[ac.mqtt]
 update_topic = "ac/update/LivingRoom"
 status_topic = "ac/status/LivingRoom"

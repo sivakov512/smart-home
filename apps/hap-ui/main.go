@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/brutella/hap"
-
 	"context"
+	"github.com/brutella/hap"
+	"github.com/eclipse/paho.mqtt.golang"
 	"hap-ui/airconditioner"
+	"hap-ui/common"
 	"log"
 	"os"
 	"os/signal"
@@ -22,12 +23,17 @@ func main() {
 		fpath = HAPUICONFIG_DEFAULT_FPATH
 	}
 
-	config, err := airconditioner.LoadConfig(fpath)
+	config, err := common.LoadConfig(fpath)
 	if err != nil {
 		panic(err)
 	}
 
-	handler := airconditioner.NewHandler(config)
+	mqttClient := mqtt.NewClient(mqtt.NewClientOptions().AddBroker(config.Broker))
+	if token := mqttClient.Connect(); token.Wait() && token.Error() != nil {
+		panic(token.Error())
+	}
+
+	handler := airconditioner.NewHandler(config.AC, mqttClient)
 
 	fs := hap.NewFsStore("./db")
 

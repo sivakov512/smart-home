@@ -24,14 +24,7 @@ type StateGuard struct {
 	S *State
 }
 
-func NewHandler(c *Config) *Handler {
-	mqttOpts := mqtt.NewClientOptions().AddBroker(c.MQTT.Broker)
-	mqttClient := mqtt.NewClient(mqttOpts)
-
-	if token := mqttClient.Connect(); token.Wait() && token.Error() != nil {
-		panic(token.Error())
-	}
-
+func NewHandler(c *Config, mqttClient mqtt.Client) *Handler {
 	h := Handler{
 		HAPAccessory: NewHAPAccessory(accessory.Info{
 			Name:         c.Name,
