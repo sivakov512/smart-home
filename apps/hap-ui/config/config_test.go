@@ -3,7 +3,9 @@ package config_test
 import (
 	"github.com/stretchr/testify/assert"
 	"hap-ui/ac"
+	"hap-ui/common"
 	"hap-ui/config"
+	"hap-ui/heater"
 	"testing"
 )
 
@@ -17,19 +19,32 @@ func TestLoadsConfigCorrectly(t *testing.T) {
 		AC: &ac.Config{
 			Manufacturer: "Midea",
 			Name:         "AC",
-			Cooling: ac.Temperature{
+			Cooling: &common.TemperatureConfig{
 				Min:  9.5,
 				Max:  31.5,
 				Step: 0.8,
 			},
-			Heating: ac.Temperature{
+			Heating: &common.TemperatureConfig{
 				Min:  0.5,
 				Max:  31.5,
 				Step: 0.8,
 			},
-			MQTT: ac.MQTT{
+			MQTT: &common.MQTTConfig{
 				UpdateTopic: "ac/update/LivingRoom",
 				StatusTopic: "ac/status/LivingRoom",
+			},
+		},
+		Heater: &heater.Config{
+			Manufacturer: "Midea",
+			Name:         "Heater",
+			Heating: &common.TemperatureConfig{
+				Min:  0.5,
+				Max:  31.5,
+				Step: 0.8,
+			},
+			MQTT: &common.MQTTConfig{
+				UpdateTopic: "heater/update/Kitchen",
+				StatusTopic: "heater/status/Kitchen",
 			},
 		},
 	}, got)

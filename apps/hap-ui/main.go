@@ -6,6 +6,7 @@ import (
 	"github.com/eclipse/paho.mqtt.golang"
 	"hap-ui/ac"
 	"hap-ui/config"
+	"hap-ui/heater"
 	"log"
 	"os"
 	"os/signal"
@@ -33,11 +34,12 @@ func main() {
 		panic(token.Error())
 	}
 
-	handler := ac.NewHandler(config.AC, mqttClient)
-
 	fs := hap.NewFsStore("./db")
 
-	server, err := hap.NewServer(fs, handler.HAPAccessory.A)
+	ac := ac.NewHandler(config.AC, mqttClient)
+	heater := heater.NewHandler(config.Heater, mqttClient)
+
+	server, err := hap.NewServer(fs, ac.HAPAccessory.A, heater.HAPAccessory.A)
 	if err != nil {
 		log.Panic(err)
 	}

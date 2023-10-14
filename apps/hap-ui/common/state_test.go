@@ -1,29 +1,29 @@
-package ac_test
+package common_test
 
 import (
 	"github.com/stretchr/testify/assert"
-	"hap-ui/ac"
+	"hap-ui/common"
 	"testing"
 )
 
 var (
 	serializationCases = []struct {
-		de *ac.State
+		de *common.State
 		se string
 	}{
 		{
-			de: &ac.State{
+			de: &common.State{
 				IsActive:           true,
-				Mode:               ac.Cool,
+				Mode:               "idle",
 				TargetTemperature:  23.0,
 				CurrentTemperature: 25.5,
 			},
-			se: "{\"is_active\":true,\"mode\":\"cool\",\"target_temperature\":23,\"current_temperature\":25.5}",
+			se: "{\"is_active\":true,\"mode\":\"idle\",\"target_temperature\":23,\"current_temperature\":25.5}",
 		},
 		{
-			de: &ac.State{
+			de: &common.State{
 				IsActive:           false,
-				Mode:               ac.Heat,
+				Mode:               "heat",
 				TargetTemperature:  28.2,
 				CurrentTemperature: 14.0,
 			},
@@ -31,17 +31,6 @@ var (
 		},
 	}
 )
-
-func TestNewStateReturnsExpected(t *testing.T) {
-	got := ac.NewState()
-
-	assert.Equal(t, &ac.State{
-		IsActive:           false,
-		Mode:               ac.Cool,
-		TargetTemperature:  0.0,
-		CurrentTemperature: 0.0,
-	}, got)
-}
 
 func TestStateSerializesCorrectly(t *testing.T) {
 	for _, tCase := range serializationCases {
@@ -57,11 +46,12 @@ func TestStateDeserializesCorrectly(t *testing.T) {
 	for _, tCase := range serializationCases {
 		t.Run(tCase.se, func(t *testing.T) {
 			input := []byte(tCase.se)
-			var got ac.State
+			var got common.State
 
-			ac.DeserializeState(input, &got)
+			common.DeserializeState(input, &got)
 
 			assert.Equal(t, tCase.de, &got)
 		})
 	}
 }
+
