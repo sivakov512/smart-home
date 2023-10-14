@@ -1,15 +1,15 @@
-package common
+package config
 
 import (
 	"github.com/pelletier/go-toml/v2"
-	"hap-ui/airconditioner"
+	"hap-ui/ac"
 	"os"
 )
 
 type Config struct {
 	Broker string
 	PIN    string
-	AC     *airconditioner.Config
+	AC     *ac.Config
 }
 
 func LoadConfig(fpath string) (*Config, error) {

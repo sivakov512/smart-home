@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/brutella/hap"
 	"github.com/eclipse/paho.mqtt.golang"
-	"hap-ui/airconditioner"
-	"hap-ui/common"
+	"hap-ui/ac"
+	"hap-ui/config"
 	"log"
 	"os"
 	"os/signal"
@@ -23,7 +23,7 @@ func main() {
 		fpath = HAPUICONFIG_DEFAULT_FPATH
 	}
 
-	config, err := common.LoadConfig(fpath)
+	config, err := config.LoadConfig(fpath)
 	if err != nil {
 		panic(err)
 	}
@@ -33,7 +33,7 @@ func main() {
 		panic(token.Error())
 	}
 
-	handler := airconditioner.NewHandler(config.AC, mqttClient)
+	handler := ac.NewHandler(config.AC, mqttClient)
 
 	fs := hap.NewFsStore("./db")
 
