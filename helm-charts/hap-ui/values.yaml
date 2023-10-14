@@ -35,24 +35,41 @@ persistence:
 
 existingConfigMap: ""
 config: |
-  manufacturer = "Midea"
-  name = "Living Room AC"
+  broker = "tcp://mosquitto:1883"
   pin = "11122333"
 
-  [cooling]
+
+  [ac]
+  manufacturer = "Midea"
+  name = "AC"
+
+  [ac.cooling]
   min = 10
   max = 30
   step = 1
 
-  [heating]
+  [ac.heating]
   min = 0
   max = 30
   step = 1
 
-  [mqtt]
-  broker = "tcp://mosquitto:1883"
+  [ac.mqtt]
   update_topic = "ac/update/LivingRoom"
   status_topic = "ac/status/LivingRoom"
+
+
+  [heater]
+  manufacturer = "Impro"
+  name = "Heater"
+
+  [heater.heating]
+  min = 0
+  max = 30
+  step = 1
+
+  [heater.mqtt]
+  update_topic = "heater/update/Kitchen"
+  status_topic = "heater/status/Kitchen"
 
 podSecurityContext: {}
   # fsGroup: 2000
