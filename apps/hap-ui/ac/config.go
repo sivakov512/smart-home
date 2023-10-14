@@ -1,4 +1,4 @@
-package airconditioner
+package ac
 
 type Config struct {
 	Manufacturer string

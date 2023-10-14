@@ -1,4 +1,4 @@
-package airconditioner
+package ac
 
 import (
 	"encoding/json"
