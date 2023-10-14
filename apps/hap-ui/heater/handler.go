@@ -1,4 +1,4 @@
-package ac
+package heater
 
 import (
 	"github.com/brutella/hap/accessory"
@@ -47,16 +47,11 @@ func NewHandler(c *Config, mqttClient mqtt.Client) *Handler {
 
 	service.CurrentHeaterCoolerState.ValueRequestFunc = h.handleFetchCurrentMode
 
-	service.TargetHeaterCoolerState.OnValueRemoteUpdate(h.handleUpdateTargetMode)
-	service.TargetHeaterCoolerState.ValueRequestFunc = h.handleFetchTargetMode
+	service.TargetHeaterCoolerState.ValueRequestFunc = func(_ *http.Request) (interface{}, int) {
+		return characteristic.TargetHeaterCoolerStateHeat, HAPOK
+	}
 
 	service.CurrentTemperature.ValueRequestFunc = h.handleFetchCurrentTemperature
-
-	service.CoolingThresholdTemperature.SetMinValue(c.Cooling.Min)
-	service.CoolingThresholdTemperature.SetMaxValue(c.Cooling.Max)
-	service.CoolingThresholdTemperature.SetStepValue(c.Cooling.Step)
-	service.CoolingThresholdTemperature.OnValueRemoteUpdate(h.handleUpdateTargetTemperature)
-	service.CoolingThresholdTemperature.ValueRequestFunc = h.handleFetchTargetTemperature
 
 	service.HeatingThresholdTemperature.SetMinValue(c.Heating.Min)
 	service.HeatingThresholdTemperature.SetMaxValue(c.Heating.Max)
@@ -77,9 +72,9 @@ func (h *Handler) setInitialState() {
 	defer h.state.M.Unlock()
 
 	h.state.S.IsActive = true
-	h.state.S.Mode = Cool
-	h.state.S.CurrentTemperature = h.config.Cooling.Min
-	h.state.S.TargetTemperature = h.config.Cooling.Min
+	h.state.S.Mode = Idle
+	h.state.S.CurrentTemperature = h.config.Heating.Min
+	h.state.S.TargetTemperature = h.config.Heating.Min
 }
 
 func (h *Handler) handleMQTTMessage(_ mqtt.Client, m mqtt.Message) {
@@ -100,15 +95,12 @@ func (h *Handler) handleMQTTMessage(_ mqtt.Client, m mqtt.Message) {
 
 	}())
 
-	mode := h.state.S.Mode
-	service.CurrentHeaterCoolerState.SetValue(modeToCurrentState(mode))
-	service.TargetHeaterCoolerState.SetValue(modeToTargetState(mode))
+	service.CurrentHeaterCoolerState.SetValue(modeToCurrentState(h.state.S.Mode))
+	service.TargetHeaterCoolerState.SetValue(characteristic.TargetHeaterCoolerStateHeat)
 
 	service.CurrentTemperature.SetValue(h.state.S.CurrentTemperature)
 
-	targetTemperature := h.state.S.TargetTemperature
-	service.CoolingThresholdTemperature.SetValue(targetTemperature)
-	service.HeatingThresholdTemperature.SetValue(targetTemperature)
+	service.HeatingThresholdTemperature.SetValue(h.state.S.TargetTemperature)
 }
 
 func (h *Handler) handleUpdateIsActive(v int) {
@@ -139,30 +131,6 @@ func (h *Handler) handleFetchCurrentMode(req *http.Request) (interface{}, int) {
 	return modeToCurrentState(h.state.S.Mode), HAPOK
 }
 
-func (h *Handler) handleUpdateTargetMode(v int) {
-	h.state.M.Lock()
-	defer h.state.M.Unlock()
-
-	var mode common.Mode
-	switch v {
-	case characteristic.TargetHeaterCoolerStateHeat:
-		mode = Heat
-	case characteristic.TargetHeaterCoolerStateCool:
-		mode = Cool
-	}
-
-	h.state.S.Mode = mode
-
-	h.publish2MQTT()
-}
-
-func (h *Handler) handleFetchTargetMode(req *http.Request) (interface{}, int) {
-	h.state.M.Lock()
-	defer h.state.M.Unlock()
-
-	return modeToTargetState(h.state.S.Mode), HAPOK
-}
-
 func (h *Handler) handleFetchCurrentTemperature(req *http.Request) (interface{}, int) {
 	h.state.M.Lock()
 	defer h.state.M.Unlock()
@@ -190,23 +158,10 @@ func modeToCurrentState(mode common.Mode) int {
 	var state int
 
 	switch mode {
-	case Heat:
-		state = characteristic.CurrentHeaterCoolerStateHeating
+	case Idle:
+		state = characteristic.CurrentHeaterCoolerStateIdle
 	default:
-		state = characteristic.CurrentHeaterCoolerStateCooling
-	}
-
-	return state
-}
-
-func modeToTargetState(mode common.Mode) int {
-	var state int
-
-	switch mode {
-	case Heat:
-		state = characteristic.TargetHeaterCoolerStateHeat
-	case Cool:
-		state = characteristic.TargetHeaterCoolerStateCool
+		state = characteristic.CurrentHeaterCoolerStateHeating
 	}
 
 	return state

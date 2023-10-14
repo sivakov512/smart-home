@@ -1,16 +1,16 @@
-package ac
+package heater
 
 import (
 	"hap-ui/common"
 )
 
 const (
-	Cool common.Mode = "cool"
+	Idle common.Mode = "idle"
 	Heat             = "heat"
 )
 
 func NewState() *common.State {
 	return &common.State{
-		Mode: Cool,
+		Mode: Idle,
 	}
 }

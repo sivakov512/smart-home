@@ -1,4 +1,4 @@
-package ac
+package heater
 
 import (
 	"hap-ui/common"
@@ -7,7 +7,6 @@ import (
 type Config struct {
 	Manufacturer string
 	Name         string
-	Cooling      *common.TemperatureConfig
 	Heating      *common.TemperatureConfig
 	MQTT         *common.MQTTConfig
 }
