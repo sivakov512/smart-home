@@ -26,8 +26,6 @@ func NewHAPService() *HAPService {
 
 	s.CurrentHeaterCoolerState = characteristic.NewCurrentHeaterCoolerState()
 	s.CurrentHeaterCoolerState.ValidVals = []int{
-		characteristic.CurrentHeaterCoolerStateInactive,
-		characteristic.CurrentHeaterCoolerStateIdle,
 		characteristic.CurrentHeaterCoolerStateCooling,
 		characteristic.CurrentHeaterCoolerStateHeating,
 	}
