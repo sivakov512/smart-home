@@ -34,16 +34,14 @@ func main() {
 		panic(token.Error())
 	}
 
-	fs := hap.NewFsStore("./db")
-
 	ac := ac.NewHandler(config.AC, mqttClient)
 	heater := heater.NewHandler(config.Heater, mqttClient)
 
-	server, err := hap.NewServer(fs, ac.HAPAccessory.A, heater.HAPAccessory.A)
+	server, err := hap.NewServer(hap.NewFsStore("./db"), ac.HAPAccessory.A, heater.HAPAccessory.A)
 	if err != nil {
 		log.Panic(err)
 	}
-	server.Pin = "11122333"
+	server.Pin = config.PIN
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt)
