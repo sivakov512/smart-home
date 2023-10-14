@@ -6,18 +6,17 @@ import (
 	"github.com/eclipse/paho.mqtt.golang"
 	"hap-ui/common"
 	"net/http"
-	"sync"
 )
 
 const (
-	HAPOK = 0
+	Idle common.Mode = "idle"
+	Heat             = "heat"
 )
 
 type Handler struct {
 	HAPAccessory *HAPAccessory
-	state        *common.StateGuard
-	mqttClient   mqtt.Client
 	config       *Config
+	*common.Handler
 }
 
 func NewHandler(c *Config, mqttClient mqtt.Client) *Handler {
@@ -26,12 +25,8 @@ func NewHandler(c *Config, mqttClient mqtt.Client) *Handler {
 			Name:         c.Name,
 			Manufacturer: c.Manufacturer,
 		}),
-		state: &common.StateGuard{
-			M: sync.Mutex{},
-			S: NewState(),
-		},
-		mqttClient: mqttClient,
-		config:     c,
+		config:  c,
+		Handler: common.NewHandler(c.MQTT, mqttClient),
 	}
 
 	h.setInitialState()
@@ -42,52 +37,47 @@ func NewHandler(c *Config, mqttClient mqtt.Client) *Handler {
 
 	service := h.HAPAccessory.Service
 
-	service.Active.OnValueRemoteUpdate(h.handleUpdateIsActive)
-	service.Active.ValueRequestFunc = h.handleFetchIsActive
+	service.Active.OnValueRemoteUpdate(h.HandleUpdateIsActive)
+	service.Active.ValueRequestFunc = h.HandleFetchIsActive
 
 	service.CurrentHeaterCoolerState.ValueRequestFunc = h.handleFetchCurrentMode
 
 	service.TargetHeaterCoolerState.ValueRequestFunc = func(_ *http.Request) (interface{}, int) {
-		return characteristic.TargetHeaterCoolerStateHeat, HAPOK
+		return characteristic.TargetHeaterCoolerStateHeat, common.HAPOK
 	}
 
-	service.CurrentTemperature.ValueRequestFunc = h.handleFetchCurrentTemperature
+	service.CurrentTemperature.ValueRequestFunc = h.HandleFetchCurrentTemperature
 
 	service.HeatingThresholdTemperature.SetMinValue(c.Heating.Min)
 	service.HeatingThresholdTemperature.SetMaxValue(c.Heating.Max)
 	service.HeatingThresholdTemperature.SetStepValue(c.Heating.Step)
-	service.HeatingThresholdTemperature.OnValueRemoteUpdate(h.handleUpdateTargetTemperature)
-	service.HeatingThresholdTemperature.ValueRequestFunc = h.handleFetchTargetTemperature
+	service.HeatingThresholdTemperature.OnValueRemoteUpdate(h.HandleUpdateTargetTemperature)
+	service.HeatingThresholdTemperature.ValueRequestFunc = h.HandleFetchTargetTemperature
 
 	return &h
 }
 
-func (h *Handler) publish2MQTT() {
-	serialized := h.state.S.Serialize()
-	h.mqttClient.Publish(h.config.MQTT.UpdateTopic, 0, false, serialized)
-}
-
 func (h *Handler) setInitialState() {
-	h.state.M.Lock()
-	defer h.state.M.Unlock()
+	h.State.M.Lock()
+	defer h.State.M.Unlock()
 
-	h.state.S.IsActive = true
-	h.state.S.Mode = Idle
-	h.state.S.CurrentTemperature = h.config.Heating.Min
-	h.state.S.TargetTemperature = h.config.Heating.Min
+	h.State.S.IsActive = true
+	h.State.S.Mode = Idle
+	h.State.S.CurrentTemperature = h.config.Heating.Min
+	h.State.S.TargetTemperature = h.config.Heating.Min
 }
 
 func (h *Handler) handleMQTTMessage(_ mqtt.Client, m mqtt.Message) {
-	h.state.M.Lock()
-	defer h.state.M.Unlock()
+	h.State.M.Lock()
+	defer h.State.M.Unlock()
 
-	common.DeserializeState(m.Payload(), h.state.S)
+	common.DeserializeState(m.Payload(), h.State.S)
 
 	service := h.HAPAccessory.Service
 
 	service.Active.SetValue(func() int {
 		v := characteristic.ActiveInactive
-		if h.state.S.IsActive {
+		if h.State.S.IsActive {
 			v = characteristic.ActiveActive
 		}
 
@@ -95,74 +85,30 @@ func (h *Handler) handleMQTTMessage(_ mqtt.Client, m mqtt.Message) {
 
 	}())
 
-	service.CurrentHeaterCoolerState.SetValue(modeToCurrentState(h.state.S.Mode))
+	service.CurrentHeaterCoolerState.SetValue(modeToCurrentState(h.State.S.Mode))
 	service.TargetHeaterCoolerState.SetValue(characteristic.TargetHeaterCoolerStateHeat)
 
-	service.CurrentTemperature.SetValue(h.state.S.CurrentTemperature)
+	service.CurrentTemperature.SetValue(h.State.S.CurrentTemperature)
 
-	service.HeatingThresholdTemperature.SetValue(h.state.S.TargetTemperature)
-}
-
-func (h *Handler) handleUpdateIsActive(v int) {
-	h.state.M.Lock()
-	defer h.state.M.Unlock()
-
-	h.state.S.IsActive = (v == characteristic.ActiveActive)
-
-	h.publish2MQTT()
-}
-
-func (h *Handler) handleFetchIsActive(req *http.Request) (interface{}, int) {
-	h.state.M.Lock()
-	defer h.state.M.Unlock()
-
-	v := characteristic.ActiveInactive
-	if h.state.S.IsActive {
-		v = characteristic.ActiveActive
-	}
-
-	return v, HAPOK
+	service.HeatingThresholdTemperature.SetValue(h.State.S.TargetTemperature)
 }
 
 func (h *Handler) handleFetchCurrentMode(req *http.Request) (interface{}, int) {
-	h.state.M.Lock()
-	defer h.state.M.Unlock()
+	h.State.M.Lock()
+	defer h.State.M.Unlock()
 
-	return modeToCurrentState(h.state.S.Mode), HAPOK
-}
-
-func (h *Handler) handleFetchCurrentTemperature(req *http.Request) (interface{}, int) {
-	h.state.M.Lock()
-	defer h.state.M.Unlock()
-
-	return h.state.S.CurrentTemperature, HAPOK
-}
-
-func (h *Handler) handleUpdateTargetTemperature(v float64) {
-	h.state.M.Lock()
-	defer h.state.M.Unlock()
-
-	h.state.S.TargetTemperature = v
-
-	h.publish2MQTT()
-}
-
-func (h *Handler) handleFetchTargetTemperature(req *http.Request) (interface{}, int) {
-	h.state.M.Lock()
-	defer h.state.M.Unlock()
-
-	return h.state.S.TargetTemperature, HAPOK
+	return modeToCurrentState(h.State.S.Mode), common.HAPOK
 }
 
 func modeToCurrentState(mode common.Mode) int {
-	var state int
+	var State int
 
 	switch mode {
 	case Idle:
-		state = characteristic.CurrentHeaterCoolerStateIdle
+		State = characteristic.CurrentHeaterCoolerStateIdle
 	default:
-		state = characteristic.CurrentHeaterCoolerStateHeating
+		State = characteristic.CurrentHeaterCoolerStateHeating
 	}
 
-	return state
+	return State
 }
