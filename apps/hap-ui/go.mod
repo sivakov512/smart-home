@@ -5,7 +5,7 @@ go 1.21.1
 require (
 	github.com/brutella/hap v0.0.28
 	github.com/eclipse/paho.mqtt.golang v1.4.3
-	github.com/pelletier/go-toml/v2 v2.1.0
+	github.com/pelletier/go-toml/v2 v2.1.1
 	github.com/stretchr/testify v1.8.4
 )
 
