@@ -1,6 +1,6 @@
 module hap-ui
 
-go 1.21.1
+go 1.21.5
 
 require (
 	github.com/brutella/hap v0.0.28
