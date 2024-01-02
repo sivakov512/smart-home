@@ -14,7 +14,7 @@ paho-mqtt = "0.12"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 sonoff-minir3 = "0.1"
-tokio = { version = "1.34", features = ["full"] }
+tokio = { version = "1.35", features = ["full"] }
 toml = "0.8"
 
 [dev-dependencies]
