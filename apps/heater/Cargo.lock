@@ -670,6 +670,7 @@ dependencies = [
  "async-trait",
  "env_logger",
  "futures",
+ "log",
  "mockall",
  "paho-mqtt",
  "rstest",
