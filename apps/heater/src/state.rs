@@ -28,6 +28,19 @@ impl From<&[u8]> for State {
     }
 }
 
+#[derive(Debug, PartialEq, Default, Serialize, Deserialize)]
+pub struct StateUpdate {
+    pub is_active: bool,
+    pub mode: Mode,
+    pub target_temperature: f32,
+}
+
+impl From<&[u8]> for StateUpdate {
+    fn from(input: &[u8]) -> Self {
+        serde_json::from_slice(input).unwrap()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -43,6 +56,22 @@ mod tests {
                 mode: Mode::Idle,
                 current_temperature: 0.0,
                 target_temperature: 0.0,
+            }
+        )
+    }
+
+    #[test]
+    fn state_update_decoded_as_expected() {
+        let input = r#"{"is_active": true, "mode": "heat", "target_temperature": 23.5}"#;
+
+        let got = StateUpdate::from(input.as_bytes());
+
+        assert_eq!(
+            got,
+            StateUpdate {
+                is_active: true,
+                mode: Mode::Heat,
+                target_temperature: 23.5
             }
         )
     }
