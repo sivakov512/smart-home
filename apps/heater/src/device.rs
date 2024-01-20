@@ -29,7 +29,7 @@ impl Device {
             t if t == self.config.update_topic => {
                 let mut state = self.state.lock().await;
 
-                *state = msg.payload().into();
+                state.update(msg.payload().into());
 
                 self.sync_state_and_relay(&mut state).await?;
 
