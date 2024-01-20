@@ -22,9 +22,11 @@ impl From<&State> for Vec<u8> {
     }
 }
 
-impl From<&[u8]> for State {
-    fn from(input: &[u8]) -> Self {
-        serde_json::from_slice(input).unwrap()
+impl State {
+    pub fn update(&mut self, updates: StateUpdate) {
+        self.is_active = updates.is_active;
+        self.mode = updates.mode;
+        self.target_temperature = updates.target_temperature;
     }
 }
 
@@ -58,6 +60,49 @@ mod tests {
                 target_temperature: 0.0,
             }
         )
+    }
+
+    #[test]
+    fn state_encoded_as_expectedf() {
+        let input = State {
+            is_active: true,
+            mode: Mode::Heat,
+            current_temperature: 21.3,
+            target_temperature: 23.5,
+        };
+
+        let got = Vec::<u8>::from(&input);
+
+        assert_eq!(
+            String::from_utf8(got).unwrap(),
+            r#"{"is_active":true,"mode":"heat","current_temperature":21.3,"target_temperature":23.5}"#
+        );
+    }
+
+    #[test]
+    fn state_updates_as_expected() {
+        let mut state = State {
+            is_active: false,
+            mode: Mode::Idle,
+            current_temperature: 21.3,
+            target_temperature: 23.5,
+        };
+
+        state.update(StateUpdate {
+            is_active: true,
+            mode: Mode::Heat,
+            target_temperature: 25.0,
+        });
+
+        assert_eq!(
+            state,
+            State {
+                is_active: true,
+                mode: Mode::Heat,
+                current_temperature: 21.3,
+                target_temperature: 25.0
+            }
+        );
     }
 
     #[test]
