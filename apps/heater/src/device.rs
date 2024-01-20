@@ -1,6 +1,7 @@
 use crate::config::Config;
 use crate::state::{Mode, State};
 use crate::thermal_sensor;
+
 use futures::stream::StreamExt;
 use paho_mqtt as mqtt;
 use std::sync::Arc;
@@ -41,6 +42,8 @@ impl Device {
                     .await?;
 
                 self.publish_state(&state).await?;
+
+                log::info!("Device initialized successfully");
             }
             // Handle update request
             t if t == self.config.update_topic => {
@@ -92,18 +95,21 @@ impl Device {
 
         self.mqtt.connect(None).await?;
 
-        // State initialization
+        log::info!("Start state initialization");
+
         self.mqtt.subscribe(&self.config.status_topic, 0).await?;
         tokio::time::sleep(std::time::Duration::from_millis(100)).await;
         match stream.try_recv() {
-            // Restore previous state if exists
             Ok(msg) => {
                 if let Some(msg) = msg {
+                    log::info!("Got previous state, handling");
+
                     self.handle_message(msg).await?;
                 }
             }
-            // Publish current state for initialization
             Err(_) => {
+                log::info!("There are no previous state, publishing default");
+
                 let state = self.state.lock().await;
                 self.publish_state(&state).await?;
             }
@@ -113,7 +119,8 @@ impl Device {
             if let Some(msg) = msg_opts {
                 self.handle_message(msg).await?;
             } else {
-                // Got disconnected, trying to reconnect
+                log::error!("Got disconnected, trying to reconnect");
+
                 while let Err(_err) = self.mqtt.connect(None).await {
                     tokio::time::sleep(std::time::Duration::from_secs(1)).await;
                 }
