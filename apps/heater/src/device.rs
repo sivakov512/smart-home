@@ -24,42 +24,42 @@ impl Device {
     }
 
     async fn handle_message(&self, msg: mqtt::Message) -> anyhow::Result<()> {
+        let mut state = self.state.lock().await;
+
         match msg.topic() {
+            // Handle status topic to initialize and restore previous state
+            t if t == self.config.status_topic => {
+                *state = msg.payload().into();
+                self.sync_state_and_relay(&mut state).await?;
+
+                self.mqtt.unsubscribe(&self.config.status_topic).await?;
+                self.mqtt
+                    .subscribe_many(
+                        &[&self.config.update_topic, &self.config.thermal_sensor_topic],
+                        &[0, 0],
+                    )
+                    .await?;
+
+                self.publish_state(&state).await?;
+            }
             // Handle update request
             t if t == self.config.update_topic => {
-                let mut state = self.state.lock().await;
-
                 state.update(msg.payload().into());
 
                 self.sync_state_and_relay(&mut state).await?;
 
-                // Notify about changed state
-                self.mqtt
-                    .publish(mqtt::Message::new_retained(
-                        &self.config.status_topic,
-                        Vec::from(&*state),
-                        0,
-                    ))
-                    .await?;
+                self.publish_state(&state).await?;
             }
             // Handle temperature changes
             t if t == self.config.thermal_sensor_topic => {
                 let thermal_state = thermal_sensor::State::from(msg.payload());
 
                 if let Some(temperature) = thermal_state.temperature {
-                    let mut state = self.state.lock().await;
                     state.current_temperature = temperature;
 
                     self.sync_state_and_relay(&mut state).await?;
 
-                    // Notify about changed state
-                    self.mqtt
-                        .publish(mqtt::Message::new_retained(
-                            &self.config.status_topic,
-                            Vec::from(&*state),
-                            0,
-                        ))
-                        .await?;
+                    self.publish_state(&state).await?;
                 }
             }
             _ => (),
@@ -91,15 +91,22 @@ impl Device {
         let mut stream = self.mqtt.get_stream(25);
 
         self.mqtt.connect(None).await?;
-        self.mqtt.subscribe(&self.config.update_topic, 0).await?;
-        self.mqtt
-            .subscribe(&self.config.thermal_sensor_topic, 0)
-            .await?;
 
-        {
-            let relay_info = self.relay.fetch_info().await?;
-            let mut state = self.state.lock().await;
-            state.is_active = relay_info.switch == sonoff_minir3::SwitchPosition::On;
+        // State initialization
+        self.mqtt.subscribe(&self.config.status_topic, 0).await?;
+        tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+        match stream.try_recv() {
+            // Restore previous state if exists
+            Ok(msg) => {
+                if let Some(msg) = msg {
+                    self.handle_message(msg).await?;
+                }
+            }
+            // Publish current state for initialization
+            Err(_) => {
+                let state = self.state.lock().await;
+                self.publish_state(&state).await?;
+            }
         }
 
         while let Some(msg_opts) = stream.next().await {
@@ -113,6 +120,17 @@ impl Device {
             }
         }
 
+        Ok(())
+    }
+
+    async fn publish_state(&self, state: &State) -> anyhow::Result<()> {
+        self.mqtt
+            .publish(mqtt::Message::new_retained(
+                &self.config.status_topic,
+                Vec::from(state),
+                0,
+            ))
+            .await?;
         Ok(())
     }
 }
