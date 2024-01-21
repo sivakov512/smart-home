@@ -46,6 +46,7 @@ existingConfigMap: ""
 config: |
   persistence true
   persistence_location /mosquitto/data/
+  autosave_interval 5
   log_dest stdout
   listener 1883
   listener 9090
