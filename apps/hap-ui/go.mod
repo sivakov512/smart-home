@@ -3,7 +3,7 @@ module hap-ui
 go 1.21.5
 
 require (
-	github.com/brutella/hap v0.0.28
+	github.com/brutella/hap v0.0.29
 	github.com/eclipse/paho.mqtt.golang v1.4.3
 	github.com/pelletier/go-toml/v2 v2.1.1
 	github.com/stretchr/testify v1.8.4
@@ -25,5 +25,6 @@ require (
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/tools v0.9.1 // indirect
+	gopkg.in/Regis24GmbH/go-diacritics.v2 v2.0.3 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
