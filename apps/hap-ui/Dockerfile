@@ -1,4 +1,4 @@
-FROM golang:1.21 as builder
+FROM golang:1.22 as builder
 
 RUN mkdir -p /opt/hap-ui
 WORKDIR /opt/hap-ui
@@ -10,7 +10,7 @@ COPY ./ /opt/hap-ui
 RUN go build .
 
 
-FROM golang:1.21
+FROM golang:1.22
 
 RUN mkdir -p /opt/hap-ui
 WORKDIR /opt/hap-ui
