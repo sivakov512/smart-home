@@ -6,7 +6,7 @@ COPY . .
 RUN cargo chef prepare --recipe-path recipe.json
 
 
-FROM rust:1.76 as builder
+FROM rust:1.77 as builder
 
 RUN mkdir -p /opt/virtual-ac
 WORKDIR /opt/virtual-ac
