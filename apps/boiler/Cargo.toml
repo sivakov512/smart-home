@@ -1,0 +1,23 @@
+[package]
+name = "boiler"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0"
+async-trait = "0.1"
+env_logger = "0.11"
+futures = "0.3"
+log = "0.4"
+paho-mqtt = "0.12"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.37", features = ["full"] }
+toml = "0.8"
+
+[dev-dependencies]
+async-std = { version = "1.12", features = ["attributes"] }
+mockall = "0.12"
+rstest = "0.19"
