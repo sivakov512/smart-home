@@ -35,7 +35,7 @@ impl From<&State> for Vec<u8> {
 }
 
 impl State {
-    pub fn update(&mut self, updates: StateUpdate) {
+    pub fn update(&mut self, updates: &StateUpdate) {
         self.state = updates.state;
     }
 }
@@ -96,7 +96,7 @@ mod tests {
                 link_quality: 100,
             };
 
-            state.update(StateUpdate { state: false });
+            state.update(&StateUpdate { state: false });
 
             assert_eq!(
                 state,
