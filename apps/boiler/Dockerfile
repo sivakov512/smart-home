@@ -32,7 +32,7 @@ RUN apt-get update && \
 
 VOLUME ["/opt/boiler/conf"]
 
-ENV HEATERCONFIG="/opt/boiler/conf/config.toml"
+ENV BOILERCONFIG="/opt/boiler/conf/config.toml"
 
 COPY --from=builder /opt/boiler/target/release/boiler /opt/boiler/boiler
 
