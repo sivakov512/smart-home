@@ -5,13 +5,14 @@ import (
 	"github.com/eclipse/paho.mqtt.golang"
 	"hap-ui/common"
 	"net/http"
+	"sync"
 )
 
 type Handler struct {
 	HAPAccessory *HAPAccessory
+	state        *StateGuard
 	config       *Config
 	mqttClient   mqtt.Client
-	state        *StateGuard
 }
 
 func NewHandler(c *Config, mqttClient mqtt.Client) *Handler {
@@ -20,6 +21,10 @@ func NewHandler(c *Config, mqttClient mqtt.Client) *Handler {
 			Name:         c.Name,
 			Manufacturer: c.Manufacturer,
 		}),
+		state: &StateGuard{
+			M: sync.Mutex{},
+			S: &State{},
+		},
 		config:     c,
 		mqttClient: mqttClient,
 	}
