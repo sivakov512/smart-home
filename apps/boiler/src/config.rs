@@ -6,6 +6,8 @@ pub struct Config {
     pub mqtt_broker: String,
     pub status_topic: String,
     pub update_topic: String,
+    pub device_status_topic: String,
+    pub device_update_topic: String,
 }
 
 impl Config {
@@ -34,6 +36,8 @@ mod tests {
 mqtt_broker = 'tcp://localhost:1883'
 status_topic = 'home/bathroom/boiler'
 update_topic = 'home/bathroom/boiler/set'
+device_status_topic = 'zigbee/home/bathroom/boiler'
+device_update_topic = 'zigbee/home/bathroom/boiler/set'
 "#;
 
         let got = input.parse::<Config>();
@@ -45,6 +49,8 @@ update_topic = 'home/bathroom/boiler/set'
                 mqtt_broker: "tcp://localhost:1883".into(),
                 status_topic: "home/bathroom/boiler".into(),
                 update_topic: "home/bathroom/boiler/set".into(),
+                device_status_topic: "zigbee/home/bathroom/boiler".into(),
+                device_update_topic: "zigbee/home/bathroom/boiler/set".into(),
             }
         )
     }
@@ -56,11 +62,15 @@ update_topic = 'home/bathroom/boiler/set'
 qtt_broker = 'tcp://localhost:1883'
 status_topic = 'home/bathroom/boiler'
 update_topic = 'home/bathroom/boiler/set'
+device_status_topic = 'zigbee/home/bathroom/boiler'
+device_update_topic = 'zigbee/home/bathroom/boiler/set'
 "#,
             r#"
 mqtt_broker = 100
 status_topic = 'home/bathroom/boiler'
 update_topic = 'home/bathroom/boiler/set'
+device_status_topic = 'zigbee/home/bathroom/boiler'
+device_update_topic = 'zigbee/home/bathroom/boiler/set'
 "#
         )]
         input: &str,
@@ -81,6 +91,8 @@ update_topic = 'home/bathroom/boiler/set'
                 mqtt_broker: "tcp://localhost:1883".into(),
                 status_topic: "home/bathroom/boiler".into(),
                 update_topic: "home/bathroom/boiler/set".into(),
+                device_status_topic: "zigbee/home/bathroom/boiler".into(),
+                device_update_topic: "zigbee/home/bathroom/boiler/set".into(),
             }
         )
     }

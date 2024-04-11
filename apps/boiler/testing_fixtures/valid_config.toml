@@ -1,3 +1,5 @@
 mqtt_broker = 'tcp://localhost:1883'
 status_topic = 'home/bathroom/boiler'
 update_topic = 'home/bathroom/boiler/set'
+device_status_topic = 'zigbee/home/bathroom/boiler'
+device_update_topic = 'zigbee/home/bathroom/boiler/set'
