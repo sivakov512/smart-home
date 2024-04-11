@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/pelletier/go-toml/v2"
 	"hap-ui/ac"
+	"hap-ui/boiler"
 	"hap-ui/heater"
 	"os"
 )
@@ -12,6 +13,7 @@ type Config struct {
 	PIN    string
 	AC     *ac.Config
 	Heater *heater.Config
+	Boiler *boiler.Config
 }
 
 func LoadConfig(fpath string) (*Config, error) {

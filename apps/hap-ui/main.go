@@ -5,6 +5,7 @@ import (
 	"github.com/brutella/hap"
 	"github.com/eclipse/paho.mqtt.golang"
 	"hap-ui/ac"
+	"hap-ui/boiler"
 	"hap-ui/config"
 	"hap-ui/heater"
 	"log"
@@ -36,8 +37,14 @@ func main() {
 
 	ac := ac.NewHandler(config.AC, mqttClient)
 	heater := heater.NewHandler(config.Heater, mqttClient)
+	boiler := boiler.NewHandler(config.Boiler, mqttClient)
 
-	server, err := hap.NewServer(hap.NewFsStore("./db"), ac.HAPAccessory.A, heater.HAPAccessory.A)
+	server, err := hap.NewServer(
+		hap.NewFsStore("./db"),
+		ac.HAPAccessory.A,
+		heater.HAPAccessory.A,
+		boiler.HAPAccessory.A,
+	)
 	if err != nil {
 		log.Panic(err)
 	}

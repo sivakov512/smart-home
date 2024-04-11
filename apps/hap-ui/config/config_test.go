@@ -3,6 +3,7 @@ package config_test
 import (
 	"github.com/stretchr/testify/assert"
 	"hap-ui/ac"
+	"hap-ui/boiler"
 	"hap-ui/common"
 	"hap-ui/config"
 	"hap-ui/heater"
@@ -45,6 +46,14 @@ func TestLoadsConfigCorrectly(t *testing.T) {
 			MQTT: &common.MQTTConfig{
 				UpdateTopic: "heater/update/Kitchen",
 				StatusTopic: "heater/status/Kitchen",
+			},
+		},
+		Boiler: &boiler.Config{
+			Manufacturer: "Nikita Sivakov",
+			Name:         "Boiler",
+			MQTT: &common.MQTTConfig{
+				StatusTopic: "home/bathroom/boiler",
+				UpdateTopic: "home/bathroom/boiler/set",
 			},
 		},
 	}, got)

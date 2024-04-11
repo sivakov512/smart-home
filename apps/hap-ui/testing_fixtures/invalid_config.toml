@@ -31,3 +31,11 @@ step = 0.8
 [heater.mqtt]
 udate_topic = "heater/update/Kitchen"
 status_topic = "heater/status/Kitchen"
+
+[boiler]
+anufacturer = "Nikita Sivakov"
+name = "Boiler"
+
+[boiler.mqtt]
+status_opic = "home/bathroom/boiler"
+update_topic = "home/bathroom/boiler/set"
