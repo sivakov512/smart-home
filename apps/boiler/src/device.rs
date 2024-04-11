@@ -26,8 +26,16 @@ impl Device {
 
         self.mqtt.connect(None).await?;
 
+        self.mqtt
+            .subscribe_many(
+                &[&self.config.device_status_topic, &self.config.update_topic],
+                &[0, 0],
+            )
+            .await?;
+
         while let Some(msg_opts) = stream.next().await {
             if let Some(msg) = msg_opts {
+                log::info!("Got msg, {:?}", msg);
                 self.handle_message(msg).await?;
             } else {
                 log::error!("Got disconnected, trying to reconnect");
