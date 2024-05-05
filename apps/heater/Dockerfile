@@ -6,7 +6,7 @@ COPY . .
 RUN cargo chef prepare --recipe-path recipe.json
 
 
-FROM rust:1.77 as builder
+FROM rust:1.78 as builder
 
 RUN mkdir -p /opt/heater
 WORKDIR /opt/heater
