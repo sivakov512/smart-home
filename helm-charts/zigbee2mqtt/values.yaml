@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: koenkk/zigbee2mqtt
   pullPolicy: IfNotPresent
-  tag: "1.36.1"
+  tag: "1.37.0"
 
 imagePullSecrets: []
 nameOverride: ""
