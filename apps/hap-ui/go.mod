@@ -3,7 +3,7 @@ module hap-ui
 go 1.22.2
 
 require (
-	github.com/brutella/hap v0.0.31
+	github.com/brutella/hap v0.0.33
 	github.com/eclipse/paho.mqtt.golang v1.4.3
 	github.com/pelletier/go-toml/v2 v2.2.2
 	github.com/stretchr/testify v1.9.0
