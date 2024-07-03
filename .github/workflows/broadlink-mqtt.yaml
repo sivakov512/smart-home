@@ -49,7 +49,7 @@ jobs:
           echo ::set-output name=latest::${IMAGE}:latest
           echo ::set-output name=current::${IMAGE}:${SHORT_SHA}
 
-      - uses: docker/build-push-action@v5
+      - uses: docker/build-push-action@v6
         with:
           context: ./apps/broadlink-mqtt/
           platforms: linux/amd64, linux/arm64
