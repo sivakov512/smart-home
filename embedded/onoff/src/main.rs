@@ -1,33 +1,38 @@
 #![no_std]
 #![no_main]
 
+mod net_stack;
+
+use embassy_executor::Spawner;
 use esp_backtrace as _;
 use esp_hal::{
-    clock::ClockControl, delay::Delay, peripherals::Peripherals, prelude::*, system::SystemControl,
+    clock::ClockControl,
+    peripherals::Peripherals,
+    prelude::*,
+    rng::Rng,
+    system::SystemControl,
+    timer::{systimer::SystemTimer, timg::TimerGroup},
 };
+use esp_println::logger::init_logger_from_env;
 
-#[entry]
-fn main() -> ! {
+#[main]
+async fn main(spawner: Spawner) {
+    init_logger_from_env();
+
     let peripherals = Peripherals::take();
     let system = SystemControl::new(peripherals.SYSTEM);
-
     let clocks = ClockControl::max(system.clock_control).freeze();
-    let delay = Delay::new(&clocks);
 
-    esp_println::logger::init_logger_from_env();
+    let timer = SystemTimer::new(peripherals.SYSTIMER).alarm0;
+    let timg0 = TimerGroup::new_async(peripherals.TIMG0, &clocks);
+    esp_hal_embassy::init(&clocks, timg0);
 
-    let timer = esp_hal::timer::systimer::SystemTimer::new(peripherals.SYSTIMER).alarm0;
-    let _init = esp_wifi::initialize(
-        esp_wifi::EspWifiInitFor::Wifi,
+    let net_stack = net_stack::setup(
         timer,
-        esp_hal::rng::Rng::new(peripherals.RNG),
+        Rng::new(peripherals.RNG),
         peripherals.RADIO_CLK,
         &clocks,
-    )
-    .unwrap();
-
-    loop {
-        log::info!("Hello world!");
-        delay.delay(500.millis());
-    }
+        peripherals.WIFI,
+        &spawner,
+    );
 }
