@@ -15,7 +15,7 @@ esp-backtrace = { version = "0.12.0", features = [
 esp-hal = { version = "0.18.0", features = [ "esp32c3" ] }
 esp-println = { version = "0.9.1", features = ["esp32c3", "log"] }
 log = { version = "0.4.21" }
-embedded-svc = { version = "0.26.1", default-features = false, features = [] }
+embedded-svc = { version = "0.28.0", default-features = false, features = [] }
 embedded-io = "0.6.1"
 esp-wifi = { version = "0.6.0", features = [
     "esp32c3",
