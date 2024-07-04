@@ -1,0 +1,50 @@
+name: Embedded OnOff
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'embedded/onoff/**'
+      - '.github/workflows/embedded_onoff.yml'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'embedded/onoff/**'
+      - '.github/workflows/embedded_onoff.yml'
+
+defaults:
+  run:
+    working-directory: ./embedded/onoff/
+
+env:
+  CARGO_TERM_COLOR: always
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        action:
+          - command: build
+            args: --release
+          - command: fmt
+            args: --all -- --check --color always
+          - command: clippy
+            args: --all-features --workspace -- -D warnings
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          target: riscv32imc-unknown-none-elf
+          toolchain: nightly
+          components: rust-src, rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - run: cargo ${{ matrix.action.command }} ${{ matrix.action.args }}
