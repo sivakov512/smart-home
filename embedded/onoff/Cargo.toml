@@ -1,0 +1,71 @@
+[package]
+name = "onoff"
+version = "0.1.0"
+authors = ["Nikita Sivakov <sivakov512@icloud.com>"]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+embassy-executor = "0.5"
+embassy-net = { version = "0.4", features = [
+    "tcp",
+    "udp",
+    "dhcpv4",
+    "medium-ethernet"
+] }
+embassy-time = "0.3"
+embedded-io = "0.6"
+embedded-io-async = "0.6"
+embedded-storage = "0.3"
+esp-backtrace = { version = "0.12", features = [
+    "esp32c3",
+    "exception-handler",
+    "panic-handler",
+    "println"
+] }
+esp-hal = { version = "0.18", features = [ "esp32c3" ] }
+esp-hal-embassy = { version = "0.1" , features = [
+    "esp32c3",
+    "time-timg0",
+    "integrated-timers"
+]}
+esp-println = { version = "0.9", features = ["esp32c3", "log"] }
+esp-wifi = { version = "0.6", features = [
+    "async",
+    "embassy-net",
+    "esp32c3",
+    "phy-enable-usb",
+    "utils",
+    "wifi-default"
+] }
+heapless = { version = "0.8", default-features = false }
+log = "0.4"
+smoltcp = { version = "0.11", default-features = false, features = [
+    "medium-ethernet",
+    "proto-dhcpv4",
+    "proto-igmp",
+    "proto-ipv4",
+    "socket-dhcpv4",
+    "socket-icmp",
+    "socket-raw",
+    "socket-tcp",
+    "socket-udp"
+] }
+static_cell = "2.1"
+
+[profile.dev]
+# Rust debug is too slow. 
+# For debug builds always builds with some optimization
+opt-level = "s"
+
+[profile.release]
+codegen-units = 1 # LLVM can perform better optimizations using a single thread
+debug = 2
+debug-assertions = false
+incremental = false
+lto = 'fat'
+opt-level = 's'
+overflow-checks = false
+
+[profile.dev.package.esp-storage]
+opt-level = 3
