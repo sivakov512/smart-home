@@ -20,5 +20,5 @@ toml = "0.8"
 
 [dev-dependencies]
 async-std = { version = "1.12", features = ["attributes"] }
-mockall = "0.12"
+mockall = "0.13"
 rstest = "0.21"
